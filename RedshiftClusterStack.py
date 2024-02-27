@@ -7,15 +7,14 @@ import aws_cdk.aws_redshift as redshift
 from constructs import Construct
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Access the variables using os.environ
+
 redshift_master_user = os.environ.get("REDSHIFT_MASTER_USER")
 redshift_master_password = os.environ.get("REDSHIFT_MASTER_PW")
-
-REDSHIFT_DB_NAME = "streaming_db"
-REDSHIFT_DEFAULT_PORT = 5439
+redshift_db_name = os.environ.get("REDSHIFT_DB_NAME")
+redshift_cluster_name = os.environ.get("REDSHIFT_CLUSTER_NAME")
+redshift_default_port = os.environ.get("REDSHIFT_DEFAULT_PORT")
 
 
 class RedshiftClusterStack(cdk.Stack):
@@ -70,10 +69,10 @@ class RedshiftClusterStack(cdk.Stack):
         self.redshift_cluster = redshift.CfnCluster(
             self,
             "RedshiftCluster",
-            cluster_identifier="redshift-cluster-firehose",
+            cluster_identifier=redshift_cluster_name,
             cluster_type="single-node",
             number_of_nodes=1,
-            db_name=REDSHIFT_DB_NAME,
+            db_name=redshift_db_name,
             master_username=redshift_master_user,
             master_user_password=redshift_master_password,
             iam_roles=[role_redshift_cluster.role_arn],

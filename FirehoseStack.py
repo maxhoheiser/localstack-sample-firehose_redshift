@@ -1,3 +1,5 @@
+import os
+
 import aws_cdk as cdk
 import aws_cdk.aws_iam as iam
 import aws_cdk.aws_kinesis as kinesis
@@ -5,13 +7,18 @@ import aws_cdk.aws_kinesisfirehose as firehose
 import aws_cdk.aws_logs as logs
 import aws_cdk.aws_s3 as s3
 from constructs import Construct
+from dotenv import load_dotenv
 
-from RedshiftClusterStack import (
-    REDSHIFT_DB_NAME,
-    REDSHIFT_DEFAULT_PORT,
-    redshift_master_password,
-    redshift_master_user,
-)
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the variables using os.environ
+redshift_master_user = os.environ.get("REDSHIFT_MASTER_USER")
+redshift_master_password = os.environ.get("REDSHIFT_MASTER_PW")
+redshift_db_name = os.environ.get("REDSHIFT_DB_NAME")
+redshift_default_port = os.environ.get("REDSHIFT_DEFAULT_PORT")
+
+
 
 
 class FirehoseStack(cdk.Stack):
@@ -159,7 +166,7 @@ class FirehoseStack(cdk.Stack):
 
         # Get the endpoint address of the redshift cluster
         redshift_destination_configuration = firehose.CfnDeliveryStream.RedshiftDestinationConfigurationProperty(
-            cluster_jdbcurl=f"jdbc:redshift://{cluster_address}:{REDSHIFT_DEFAULT_PORT}/{REDSHIFT_DB_NAME}",
+            cluster_jdbcurl=f"jdbc:redshift://{cluster_address}:{redshift_default_port}/{redshift_db_name}",
             copy_command=firehose.CfnDeliveryStream.CopyCommandProperty(
                 data_table_name="dataTableName"
             ),
